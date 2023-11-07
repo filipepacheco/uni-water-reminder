@@ -1,26 +1,13 @@
 version: 1
-backend:
+frontend:
   phases:
-    # Defines the deployment workflow
+    # IMPORTANT - Please verify your build commands
     build:
-      commands:
-        # Executes Amplify CLI commands during the build phase
-        - amplifyPush --simple
-  frontend:
-    phases:
-      # Defines the deployment workflow for the frontend
-      build:
-        # Specifies the frontend build commands
-        commands:
-          - npm ci # Installs dependencies using npm ci (or npm install if you prefer)
-          - npm run build # Builds your React application
+      commands: ["npm install", "npm run build"]
   artifacts:
-    # Defines the artifacts for the build phase
-    baseDirectory: ./build # Specifies the base directory for artifacts
+    # IMPORTANT - Please verify your build output directory
+    baseDirectory: build
     files:
-      # Specifies the files to be included in the artifact
       - '**/*'
   cache:
-    # Defines caching settings for Amplify CLI
-    paths:
-      - node_modules/**/*
+    paths: []
