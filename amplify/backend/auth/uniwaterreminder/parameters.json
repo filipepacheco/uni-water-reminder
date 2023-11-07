@@ -1,0 +1,32 @@
+{
+  "authSelections": "userPoolOnly",
+  "resourceName": "uniwaterreminder",
+  "serviceType": "imported",
+  "region": "us-west-2",
+  "aliasAttributes": [
+    "email",
+    "phone_number"
+  ],
+  "authProvidersUserPool": [],
+  "requiredAttributes": [
+    "name",
+    "email",
+    "birthdate",
+    "phone_number"
+  ],
+  "passwordPolicyMinLength": 8,
+  "passwordPolicyCharacters": [
+    "Requires Lowercase",
+    "Requires Uppercase",
+    "Requires Numbers",
+    "Requires Symbols"
+  ],
+  "mfaConfiguration": "OPTIONAL",
+  "autoVerifiedAttributes": [
+    "phone_number"
+  ],
+  "mfaTypes": [
+    "SMS Text Message",
+    "TOTP"
+  ]
+}

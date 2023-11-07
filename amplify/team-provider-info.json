@@ -1,0 +1,25 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-amplify9cb7741efd374-staging-190226-authRole",
+      "UnauthRoleArn": "arn:aws:iam::524921764467:role/amplify-amplify9cb7741efd374-staging-190226-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::524921764467:role/amplify-amplify9cb7741efd374-staging-190226-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-amplify9cb7741efd374-staging-190226-deployment",
+      "UnauthRoleName": "amplify-amplify9cb7741efd374-staging-190226-unauthRole",
+      "StackName": "amplify-amplify9cb7741efd374-staging-190226",
+      "StackId": "arn:aws:cloudformation:us-west-2:524921764467:stack/amplify-amplify9cb7741efd374-staging-190226/3161dac0-7da0-11ee-813a-0664d08157cf",
+      "AmplifyAppId": "d3vbyvhaccblf2"
+    },
+    "categories": {
+      "auth": {
+        "uniwaterreminder": {
+          "nativeClientId": "4v7c3f33m5f3pgfj146nas2qu8",
+          "userPoolId": "us-west-2_RM0jUDDF9",
+          "userPoolName": "uni-water-reminder-pool",
+          "webClientId": "4v7c3f33m5f3pgfj146nas2qu8"
+        }
+      }
+    }
+  }
+}
