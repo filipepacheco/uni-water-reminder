@@ -2,21 +2,14 @@ version: 0.2
 
 frontend:
   phases:
-    install:
-      runtime-versions:
-        nodejs: 14
-      commands:
-        - npm install
-
     build:
-      commands:
-        - npm run build
-
+      commands: ["npm run build"]
   artifacts:
-    files: '**/*'
-
+    # IMPORTANT - Please verify your build output directory
+    baseDirectory: build
+    files:
+      - '**/*'
   cache:
-    paths:
-      - node_modules/**/*
+    paths: []
 
 
