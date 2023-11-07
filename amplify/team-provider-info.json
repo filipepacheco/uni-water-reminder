@@ -13,12 +13,10 @@
     },
     "categories": {
       "auth": {
-        "uniwaterreminder": {
-          "nativeClientId": "4v7c3f33m5f3pgfj146nas2qu8",
-          "userPoolId": "us-west-2_RM0jUDDF9",
-          "userPoolName": "uni-water-reminder-pool",
-          "webClientId": "4v7c3f33m5f3pgfj146nas2qu8"
-        }
+        "uniwaterreminder871d4a7b": {}
+      },
+      "api": {
+        "uniwaterreminder": {}
       }
     }
   }

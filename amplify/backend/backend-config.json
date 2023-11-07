@@ -23,46 +23,32 @@
     }
   },
   "auth": {
-    "uniwaterreminder": {
+    "uniwaterreminder871d4a7b": {
       "customAuth": false,
       "dependsOn": [],
+      "frontendAuthConfig": {
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyCharacters": [],
+          "passwordPolicyMinLength": 8
+        },
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "socialProviders": [],
+        "usernameAttributes": [
+          "EMAIL",
+          "PHONE_NUMBER"
+        ],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
       "providerPlugin": "awscloudformation",
-      "service": "Cognito",
-      "serviceType": "imported"
-    }
-  },
-  "parameters": {
-    "AMPLIFY_auth_uniwaterreminder_nativeClientId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "uniwaterreminder"
-        }
-      ]
-    },
-    "AMPLIFY_auth_uniwaterreminder_userPoolId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "uniwaterreminder"
-        }
-      ]
-    },
-    "AMPLIFY_auth_uniwaterreminder_userPoolName": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "uniwaterreminder"
-        }
-      ]
-    },
-    "AMPLIFY_auth_uniwaterreminder_webClientId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "uniwaterreminder"
-        }
-      ]
+      "service": "Cognito"
     }
   }
 }
