@@ -19,3 +19,7 @@ amplifytools.xcconfig
 .secret-*
 **.sample
 #amplify-do-not-edit-end
+/.idea/.gitignore
+/.idea/modules.xml
+/.idea/uni-water-reminder.iml
+/.idea/vcs.xml
