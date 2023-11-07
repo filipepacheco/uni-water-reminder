@@ -1,18 +1,39 @@
-import { Amplify } from 'aws-amplify';
+import {Amplify} from 'aws-amplify';
 
-import { withAuthenticator } from '@aws-amplify/ui-react';
+import {Authenticator, CheckboxField, Radio, RadioGroupField, useAuthenticator} from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 
 import awsExports from './aws-exports';
+
 Amplify.configure(awsExports);
 
-function App({ signOut, user }) {
-  return (
-      <>
-        <h1>Hello {user.username}</h1>
-        <button onClick={signOut}>Sign out</button>
-      </>
-  );
+export default function App() {
+    return (
+        <Authenticator components={
+            {
+                SignUp: {
+                    FormFields() {
+                        const {validationErrors} = useAuthenticator();
+                        return (
+                            <>
+                                <Authenticator.SignUp.FormFields/>
+                                <RadioGroupField label="Gender" name="gender" direction="column" size="medium">
+                                    <Radio value="MALE">Male</Radio>
+                                    <Radio value="FEMALE">Female</Radio>
+                                    <Radio>Rather not say</Radio>
+                                </RadioGroupField>
+                            </>
+                        );
+                    },
+                }
+            }
+        }>
+            {({signOut, user}) => (
+                <main>
+                    <h1>Hello, {user.attributes.name.split(' ')[0]}! :)</h1>
+                    <button onClick={signOut}>Sign out</button>
+                </main>
+            )}
+        </Authenticator>
+    );
 }
-
-export default withAuthenticator(App);
