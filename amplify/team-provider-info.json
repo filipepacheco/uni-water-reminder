@@ -12,11 +12,11 @@
       "AmplifyAppId": "d3vbyvhaccblf2"
     },
     "categories": {
-      "auth": {
-        "uniwaterreminder871d4a7b": {}
-      },
       "api": {
         "uniwaterreminder": {}
+      },
+      "auth": {
+        "uniwaterremindere8ea1215e8ea1215": {}
       }
     }
   }

@@ -1,14 +1,12 @@
 {
   "version": "1",
   "cognitoConfig": {
-    "identityPoolName": "uniwaterreminder871d4a7b_identitypool_871d4a7b",
-    "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "uniwat871d4a7b",
-    "userPoolName": "uniwaterreminder871d4a7b_userpool_871d4a7b",
+    "resourceNameTruncated": "uniwate8ea1215",
+    "userPoolName": "uniwaterremindere8ea1215_userpool_e8ea1215",
     "autoVerifiedAttributes": [
       "email"
     ],
-    "mfaConfiguration": "OFF",
+    "mfaConfiguration": "OPTIONAL",
     "mfaTypes": [
       "SMS Text Message"
     ],
@@ -20,7 +18,11 @@
     "passwordPolicyMinLength": 8,
     "passwordPolicyCharacters": [],
     "requiredAttributes": [
-      "email"
+      "birthdate",
+      "email",
+      "gender",
+      "name",
+      "phone_number"
     ],
     "aliasAttributes": [],
     "userpoolClientGenerateSecret": false,
@@ -31,19 +33,41 @@
     "userpoolClientReadAttributes": [
       "email"
     ],
-    "userpoolClientLambdaRole": "uniwat871d4a7b_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "uniwate8ea1215_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "871d4a7b",
-    "resourceName": "uniwaterreminder871d4a7b",
-    "authSelections": "identityPoolAndUserPool",
+    "sharedId": "e8ea1215",
+    "resourceName": "uniwaterremindere8ea1215e8ea1215",
+    "authSelections": "userPoolOnly",
     "useDefault": "default",
     "usernameAttributes": [
       "email, phone_number"
     ],
+    "userPoolGroups": false,
+    "adminQueries": false,
     "triggers": {},
+    "hostedUI": false,
     "userPoolGroupList": [],
     "serviceName": "Cognito",
     "usernameCaseSensitive": false,
-    "useEnabledMfas": true
+    "useEnabledMfas": true,
+    "authRoleArn": {
+      "Fn::GetAtt": [
+        "AuthRole",
+        "Arn"
+      ]
+    },
+    "unauthRoleArn": {
+      "Fn::GetAtt": [
+        "UnauthRole",
+        "Arn"
+      ]
+    },
+    "breakCircularDependency": true,
+    "dependsOn": [],
+    "authProviders": [],
+    "parentStack": {
+      "Ref": "AWS::StackId"
+    },
+    "permissions": []
   }
 }
