@@ -12,15 +12,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-amplify/ui-react": "^6.0.3",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "aws-amplify": "^6.0.5",
+    "aws-sdk": "^2.1502.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4",
-    "@aws-amplify/ui-react": "^5.3.2",
-    "aws-amplify": "^5.3.12"
+    "web-vitals": "^2.1.4"
   },
   "browserslist": {
     "production": [

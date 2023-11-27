@@ -1,21 +1,21 @@
 type History @model @auth(rules: [{allow: public}]) {
   id: ID!
   date: AWSDateTime
-  userID: ID! @index(name: "byUser")
+  userID: ID! @index(name: "byUniUser")
 }
 
 type Reminder @model @auth(rules: [{allow: public}]) {
   id: ID!
   periodicity: String
-  userID: ID! @index(name: "byUser")
+  userID: ID! @index(name: "byUniUser")
 }
 
-type User @model @auth(rules: [{allow: public}]) {
+type UniUser @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String
   birthdate: AWSDate
   weight: Float
-  Histories: [History] @hasMany(indexName: "byUser", fields: ["id"])
-  Reminders: [Reminder] @hasMany(indexName: "byUser", fields: ["id"])
+  Histories: [History] @hasMany(indexName: "byUniUser", fields: ["id"])
+  Reminders: [Reminder] @hasMany(indexName: "byUniUser", fields: ["id"])
 }
  

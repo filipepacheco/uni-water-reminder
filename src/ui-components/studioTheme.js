@@ -1230,13 +1230,13 @@ export default createTheme({
       },
       brand: {
         primary: {
-          10: { value: "{colors.teal.10.value}" },
-          20: { value: "{colors.teal.20.value}" },
-          40: { value: "{colors.teal.40.value}" },
-          60: { value: "{colors.teal.60.value}" },
-          80: { value: "{colors.teal.80.value}" },
-          90: { value: "{colors.teal.90.value}" },
-          100: { value: "{colors.teal.100.value}" },
+          10: { value: "{colors.red.10.value}" },
+          20: { value: "{colors.red.20.value}" },
+          40: { value: "{colors.red.40.value}" },
+          60: { value: "{colors.red.60.value}" },
+          80: { value: "{colors.red.80.value}" },
+          90: { value: "{colors.red.90.value}" },
+          100: { value: "{colors.red.100.value}" },
         },
         secondary: {
           10: { value: "{colors.purple.10.value}" },

@@ -1,12 +1,14 @@
 {
   "version": "1",
   "cognitoConfig": {
-    "resourceNameTruncated": "uniwate8ea1215",
-    "userPoolName": "uniwaterremindere8ea1215_userpool_e8ea1215",
+    "identityPoolName": "uniwaterreminder6530b7d1_identitypool_6530b7d1",
+    "allowUnauthenticatedIdentities": false,
+    "resourceNameTruncated": "uniwat6530b7d1",
+    "userPoolName": "uniwaterreminder6530b7d1_userpool_6530b7d1",
     "autoVerifiedAttributes": [
       "email"
     ],
-    "mfaConfiguration": "OPTIONAL",
+    "mfaConfiguration": "OFF",
     "mfaTypes": [
       "SMS Text Message"
     ],
@@ -33,41 +35,19 @@
     "userpoolClientReadAttributes": [
       "email"
     ],
-    "userpoolClientLambdaRole": "uniwate8ea1215_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "uniwat6530b7d1_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "e8ea1215",
-    "resourceName": "uniwaterremindere8ea1215e8ea1215",
-    "authSelections": "userPoolOnly",
+    "sharedId": "6530b7d1",
+    "resourceName": "uniwaterreminder6530b7d1",
+    "authSelections": "identityPoolAndUserPool",
     "useDefault": "default",
     "usernameAttributes": [
-      "email, phone_number"
+      "email"
     ],
-    "userPoolGroups": false,
-    "adminQueries": false,
     "triggers": {},
-    "hostedUI": false,
     "userPoolGroupList": [],
     "serviceName": "Cognito",
     "usernameCaseSensitive": false,
-    "useEnabledMfas": true,
-    "authRoleArn": {
-      "Fn::GetAtt": [
-        "AuthRole",
-        "Arn"
-      ]
-    },
-    "unauthRoleArn": {
-      "Fn::GetAtt": [
-        "UnauthRole",
-        "Arn"
-      ]
-    },
-    "breakCircularDependency": true,
-    "dependsOn": [],
-    "authProviders": [],
-    "parentStack": {
-      "Ref": "AWS::StackId"
-    },
-    "permissions": []
+    "useEnabledMfas": true
   }
 }

@@ -7,13 +7,24 @@ export type AmplifyDependentResourcesAttributes = {
     }
   },
   "auth": {
-    "uniwaterremindere8ea1215e8ea1215": {
+    "uniwaterreminder6530b7d1": {
       "AppClientID": "string",
       "AppClientIDWeb": "string",
       "CreatedSNSRole": "string",
+      "IdentityPoolId": "string",
+      "IdentityPoolName": "string",
       "UserPoolArn": "string",
       "UserPoolId": "string",
       "UserPoolName": "string"
+    }
+  },
+  "function": {
+    "testCreateUser": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
     }
   }
 }

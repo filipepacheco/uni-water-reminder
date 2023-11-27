@@ -15,8 +15,14 @@
       "api": {
         "uniwaterreminder": {}
       },
+      "function": {
+        "testCreateUser": {
+          "deploymentBucketName": "amplify-amplify9cb7741efd374-staging-190226-deployment",
+          "s3Key": "amplify-builds/testCreateUser-376f5355736b312f3745-build.zip"
+        }
+      },
       "auth": {
-        "uniwaterremindere8ea1215e8ea1215": {}
+        "uniwaterreminder6530b7d1": {}
       }
     }
   }

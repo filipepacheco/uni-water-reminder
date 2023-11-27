@@ -7,12 +7,14 @@
 /* eslint-disable */
 import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
-import { User } from "../models";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
-import { DataStore } from "aws-amplify";
-export default function User(props) {
+import { API } from "aws-amplify";
+import { getUniUser } from "../graphql/queries";
+import { updateUniUser } from "../graphql/mutations";
+export default function UniUserUpdateForm(props) {
   const {
-    clearOnSuccess = true,
+    id: idProp,
+    uniUser: uniUserModelProp,
     onSuccess,
     onError,
     onSubmit,
@@ -31,11 +33,30 @@ export default function User(props) {
   const [weight, setWeight] = React.useState(initialValues.weight);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
-    setName(initialValues.name);
-    setBirthdate(initialValues.birthdate);
-    setWeight(initialValues.weight);
+    const cleanValues = uniUserRecord
+      ? { ...initialValues, ...uniUserRecord }
+      : initialValues;
+    setName(cleanValues.name);
+    setBirthdate(cleanValues.birthdate);
+    setWeight(cleanValues.weight);
     setErrors({});
   };
+  const [uniUserRecord, setUniUserRecord] = React.useState(uniUserModelProp);
+  React.useEffect(() => {
+    const queryData = async () => {
+      const record = idProp
+        ? (
+            await API.graphql({
+              query: getUniUser.replaceAll("__typename", ""),
+              variables: { id: idProp },
+            })
+          )?.data?.getUniUser
+        : uniUserModelProp;
+      setUniUserRecord(record);
+    };
+    queryData();
+  }, [idProp, uniUserModelProp]);
+  React.useEffect(resetStateValues, [uniUserRecord]);
   const validations = {
     name: [],
     birthdate: [],
@@ -67,9 +88,9 @@ export default function User(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          name,
-          birthdate,
-          weight,
+          name: name ?? null,
+          birthdate: birthdate ?? null,
+          weight: weight ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -99,20 +120,26 @@ export default function User(props) {
               modelFields[key] = null;
             }
           });
-          await DataStore.save(new User(modelFields));
+          await API.graphql({
+            query: updateUniUser.replaceAll("__typename", ""),
+            variables: {
+              input: {
+                id: uniUserRecord.id,
+                ...modelFields,
+              },
+            },
+          });
           if (onSuccess) {
             onSuccess(modelFields);
           }
-          if (clearOnSuccess) {
-            resetStateValues();
-          }
         } catch (err) {
           if (onError) {
-            onError(modelFields, err.message);
+            const messages = err.errors.map((e) => e.message).join("\n");
+            onError(modelFields, messages);
           }
         }
       }}
-      {...getOverrideProps(overrides, "User")}
+      {...getOverrideProps(overrides, "UniUserUpdateForm")}
       {...rest}
     >
       <TextField
@@ -203,13 +230,14 @@ export default function User(props) {
         {...getOverrideProps(overrides, "CTAFlex")}
       >
         <Button
-          children="Clear"
+          children="Reset"
           type="reset"
           onClick={(event) => {
             event.preventDefault();
             resetStateValues();
           }}
-          {...getOverrideProps(overrides, "ClearButton")}
+          isDisabled={!(idProp || uniUserModelProp)}
+          {...getOverrideProps(overrides, "ResetButton")}
         ></Button>
         <Flex
           gap="15px"
@@ -219,7 +247,10 @@ export default function User(props) {
             children="Submit"
             type="submit"
             variation="primary"
-            isDisabled={Object.values(errors).some((e) => e?.hasError)}
+            isDisabled={
+              !(idProp || uniUserModelProp) ||
+              Object.values(errors).some((e) => e?.hasError)
+            }
             {...getOverrideProps(overrides, "SubmitButton")}
           ></Button>
         </Flex>
