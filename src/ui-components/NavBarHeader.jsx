@@ -11,7 +11,7 @@ import LogoWithText from "./LogoWithText";
 import { Flex, Image, Text } from "@aws-amplify/ui-react";
 import MyIcon from "./MyIcon";
 export default function NavBarHeader(props) {
-  const { overrides, ...rest } = props;
+  const { history, overrides, ...rest } = props;
   return (
     <Flex
       gap="40px"
@@ -72,7 +72,7 @@ export default function NavBarHeader(props) {
           position="relative"
           padding="0px 0px 0px 0px"
           whiteSpace="pre-wrap"
-          children="Dashboard"
+          children="Home"
           {...getOverrideProps(overrides, "Dashboard")}
         ></Text>
         <Text
@@ -93,7 +93,7 @@ export default function NavBarHeader(props) {
           position="relative"
           padding="0px 0px 0px 0px"
           whiteSpace="pre-wrap"
-          children="Jobs"
+          children="My reminders"
           {...getOverrideProps(overrides, "Jobs")}
         ></Text>
         <Text
@@ -114,7 +114,7 @@ export default function NavBarHeader(props) {
           position="relative"
           padding="0px 0px 0px 0px"
           whiteSpace="pre-wrap"
-          children="Applicants"
+          children="My history"
           {...getOverrideProps(overrides, "Applicants")}
         ></Text>
         <Text

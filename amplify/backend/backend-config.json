@@ -1,4 +1,10 @@
 {
+  "analytics": {
+    "uniwaterreminder": {
+      "providerPlugin": "awscloudformation",
+      "service": "Pinpoint"
+    }
+  },
   "api": {
     "uniwaterreminder": {
       "dependsOn": [],
@@ -23,35 +29,12 @@
     }
   },
   "auth": {
-    "uniwaterreminder6530b7d1": {
+    "uniwaterreminder": {
       "customAuth": false,
       "dependsOn": [],
-      "frontendAuthConfig": {
-        "mfaConfiguration": "OFF",
-        "mfaTypes": [
-          "SMS"
-        ],
-        "passwordProtectionSettings": {
-          "passwordPolicyCharacters": [],
-          "passwordPolicyMinLength": 8
-        },
-        "signupAttributes": [
-          "BIRTHDATE",
-          "EMAIL",
-          "GENDER",
-          "NAME",
-          "PHONE_NUMBER"
-        ],
-        "socialProviders": [],
-        "usernameAttributes": [
-          "EMAIL"
-        ],
-        "verificationMechanisms": [
-          "EMAIL"
-        ]
-      },
       "providerPlugin": "awscloudformation",
-      "service": "Cognito"
+      "service": "Cognito",
+      "serviceType": "imported"
     }
   },
   "function": {
@@ -61,7 +44,127 @@
       "service": "Lambda"
     }
   },
+  "notifications": {
+    "uniwaterreminder": {
+      "channels": [
+        "InAppMessaging"
+      ],
+      "service": "Pinpoint"
+    }
+  },
   "parameters": {
+    "AMPLIFY_analytics_Pinpoint_Id": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_analytics_Pinpoint_Name": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_analytics_Pinpoint_Region": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_auth_uniwaterreminder_allowUnauthenticatedIdentities": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "uniwaterreminder"
+        }
+      ]
+    },
+    "AMPLIFY_auth_uniwaterreminder_authRoleArn": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "uniwaterreminder"
+        }
+      ]
+    },
+    "AMPLIFY_auth_uniwaterreminder_authRoleName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "uniwaterreminder"
+        }
+      ]
+    },
+    "AMPLIFY_auth_uniwaterreminder_identityPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "uniwaterreminder"
+        }
+      ]
+    },
+    "AMPLIFY_auth_uniwaterreminder_identityPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "uniwaterreminder"
+        }
+      ]
+    },
+    "AMPLIFY_auth_uniwaterreminder_nativeClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "uniwaterreminder"
+        }
+      ]
+    },
+    "AMPLIFY_auth_uniwaterreminder_unauthRoleArn": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "uniwaterreminder"
+        }
+      ]
+    },
+    "AMPLIFY_auth_uniwaterreminder_unauthRoleName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "uniwaterreminder"
+        }
+      ]
+    },
+    "AMPLIFY_auth_uniwaterreminder_userPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "uniwaterreminder"
+        }
+      ]
+    },
+    "AMPLIFY_auth_uniwaterreminder_userPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "uniwaterreminder"
+        }
+      ]
+    },
+    "AMPLIFY_auth_uniwaterreminder_webClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "uniwaterreminder"
+        }
+      ]
+    },
     "AMPLIFY_function_testCreateUser_deploymentBucketName": {
       "usedBy": [
         {
@@ -77,6 +180,31 @@
           "resourceName": "testCreateUser"
         }
       ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Id": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Name": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Region": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
+        }
+      ]
     }
-  }
+  },
+  "storage": {}
 }

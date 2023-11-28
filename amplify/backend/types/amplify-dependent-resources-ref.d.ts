@@ -1,21 +1,16 @@
 export type AmplifyDependentResourcesAttributes = {
+  "analytics": {
+    "uniwaterreminder": {
+      "Id": "string",
+      "Region": "string",
+      "appName": "string"
+    }
+  },
   "api": {
     "uniwaterreminder": {
       "GraphQLAPIEndpointOutput": "string",
       "GraphQLAPIIdOutput": "string",
       "GraphQLAPIKeyOutput": "string"
-    }
-  },
-  "auth": {
-    "uniwaterreminder6530b7d1": {
-      "AppClientID": "string",
-      "AppClientIDWeb": "string",
-      "CreatedSNSRole": "string",
-      "IdentityPoolId": "string",
-      "IdentityPoolName": "string",
-      "UserPoolArn": "string",
-      "UserPoolId": "string",
-      "UserPoolName": "string"
     }
   },
   "function": {

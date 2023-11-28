@@ -32,6 +32,8 @@ export declare type NavBarHeaderOverridesProps = {
     image?: PrimitiveOverrideProps<ImageProps>;
 } & EscapeHatchProps;
 export declare type NavBarHeaderProps = React.PropsWithChildren<Partial<FlexProps> & {
+    history?: any;
+} & {
     overrides?: NavBarHeaderOverridesProps | undefined | null;
 }>;
 export default function NavBarHeader(props: NavBarHeaderProps): React.ReactElement;

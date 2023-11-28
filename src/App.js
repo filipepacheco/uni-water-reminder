@@ -1,60 +1,108 @@
 import {Amplify} from 'aws-amplify';
 import {Hub} from 'aws-amplify/utils';
-
-import {Authenticator, Radio, RadioGroupField} from '@aws-amplify/ui-react';
+import {
+    Authenticator,
+    Radio,
+    RadioGroupField,
+    Table,
+    TableCell,
+    TableHead,
+    TableRow,
+    TextField
+} from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import awsExports from "./aws-exports";
 import {generateClient} from "aws-amplify/api";
 import {listHistories, listReminders, listUniUsers} from "./graphql/queries";
 import {fetchUserAttributes} from 'aws-amplify/auth';
-import {createUniUser} from "./graphql/mutations";
-import {useEffect, useState} from "react";
+import {createHistory, createReminder, createUniUser} from "./graphql/mutations";
+import React, {useEffect, useState} from "react";
+import {DrinkHistory, MainPage, NewReminder} from "./ui-components";
+import {initializeInAppMessaging, syncMessages} from 'aws-amplify/in-app-messaging';
+import {withInAppMessaging} from "@aws-amplify/ui-react-notifications";
 
 Amplify.configure(awsExports);
+initializeInAppMessaging();
 
 const client = generateClient();
 
-const createUserOnDB = async (user) => {
-    return client.graphql({
-        query: createUniUser, variables: {
-            input: {
-                birthdate: user.birthdate, email: user.email, gender: user.gender, name: user.name
+const createUserOnDB = (user) => {
+    try {
+        const options = {
+            query: createUniUser,
+            variables: {
+                input: {
+                    birthdate: user.birthdate,
+                    name: user.name,
+                    email: user.email,
+                    weight: user["custom:weight"]
+                }
             }
         }
-    })
+        console.log('created user')
+        return client.graphql(options);
+    } catch (error) {
+        console.error('Error creating user:', error);
+        console.log(options)
+        throw error; // Rethrow the error to propagate it further if needed
+    }
 }
 
-const getUserFromDB = async (user) => {
-    return client.graphql({
-        query: listUniUsers, variables: {filter: {email: {eq: user.email}}}
-    });
+
+const getUserFromDB = (email) => {
+    try {
+        return client.graphql({
+            query: listUniUsers, variables: {filter: {email: {eq: email}}}
+        });
+    } catch (error) {
+        console.log("Error Get User", error);
+        console.log("Error User", email);
+    }
 }
 
 const getRemindersFromDB = async (user) => {
-    return client.graphql({
-        query: listReminders, variables: {filter: {userID: {eq: user.id}}}
-    });
+    try {
+        return await client.graphql({
+            query: listReminders, variables: {filter: {userID: {eq: user.id}}}
+        });
+    } catch (error) {
+        console.log("Error get reminder", error);
+
+    }
 }
 
 const getHistoryFromDB = async (user) => {
-    return client.graphql({
-        query: listHistories, variables: {filter: {userID: {eq: user.id}}}
-    });
+    try {
+        return await client.graphql({
+            query: listHistories, variables: {filter: {userID: {eq: user.id}}}
+        });
+    } catch (error) {
+        console.log("Error get history", error);
+    }
 }
 
 Hub.listen('auth', async ({payload}) => {
-    if (payload?.event === 'signedIn') {
-        const currentUser = await fetchUserAttributes();
+    try {
+        if (payload?.event === 'signedIn') {
+            const currentUser = await fetchUserAttributes() ?? null;
+            if (currentUser) {
+                const listUsers = await getUserFromDB(currentUser.email);
+                if (listUsers.data.listUniUsers.items.length === 0) {
+                    await createUserOnDB(currentUser);
+                }
+            }
+        }
 
-        if (getUserFromDB(currentUser)?.data?.listUniUsers?.items?.length === 0) await createUserOnDB(currentUser);
+    } catch (e) {
+        console.log("Error Auth", e);
     }
 });
-
 const SignUpComponents = {
     SignUp: {
         FormFields() {
             return (<>
                 <Authenticator.SignUp.FormFields/>
+                <TextField label={"Weight"} name={"custom:weight"} type={"number"} defaultValue={null}/>
                 <RadioGroupField label="Gender" name="gender" direction="column" size="medium"
                                  defaultValue={null} legend={'Gender'}>
                     <Radio value="MALE">Male</Radio>
@@ -64,49 +112,45 @@ const SignUpComponents = {
             </>);
         },
     }
-}
+};
 
+
+const myFirstEvent = {name: 'my_event'};
 
 const App = () => {
-    const [currentUser, setCurrentUser] = useState(null);
-    const [user, setUser] = useState(null);
-
-    useEffect(() => {
-        console.log('oi')
-        const fetchData = async () => {
-            setCurrentUser(await fetchUserAttributes());
-        };
-
-        if (user) {
-            fetchData();
-        }
-    }, [user]);
-
     return (
         <Authenticator components={SignUpComponents}>
-            {({signOut, user}) => {
-                setUser(user); // Update the 'user' state when it changes
-                return (
-                    <main>
-                        {currentUser && <h1>Hello {currentUser.name.split(' ')[0]}!</h1>}
-                        <button onClick={signOut}>Sign out</button>
-                        <MyReminders user={currentUser}></MyReminders>
-                        <MyHistory user={currentUser}></MyHistory>
-                    </main>
-                )
-            }}
+            {({signOut, user}) => <MyMainPage signOut={signOut} user={user}/>}
         </Authenticator>
     );
 };
 
-const MyReminders = (currentUser) => {
-    const [reminders, setReminders] = useState(null);
-    const [user, setUser] = useState(currentUser);
-
+const MyMainPage = ({signOut, user}) => {
+    const [currentUser, setCurrentUser] = useState(user);
+    const [userFromDb, setUserFromDb] = useState(null);
+    const [reminders, setReminders] = useState([]);
+    const [histories, setHistories] = useState([]);
+    const [consumedAmount, setConsumedAmount] = useState(0); // Declare consumedAmount
     useEffect(() => {
         const fetchData = async () => {
-            const reminders = await getRemindersFromDB(currentUser)
-            setReminders(reminders.data.listReminders.items);
+            const currentUser = await fetchUserAttributes();
+
+            if (currentUser) {
+                setCurrentUser(currentUser);
+
+                const userFromDb = await getUserFromDB(currentUser.email);
+                if (userFromDb)
+                    setUserFromDb(userFromDb.data.listUniUsers.items[0]);
+
+                const history = await getHistoryFromDB(currentUser)
+                if (history) {
+                    setHistories(history.data.listHistories.items);
+                }
+
+                const reminders = await getRemindersFromDB(currentUser)
+                if (reminders)
+                    setReminders(reminders.data.listReminders.items);
+            }
         };
 
         if (currentUser) {
@@ -114,52 +158,122 @@ const MyReminders = (currentUser) => {
         }
     }, [user]);
 
-    return (
-        <div>
-            <h4>You've got {reminders.length} reminder(s)!</h4>
-            {reminders && reminders.map((reminder) => {
-                return (
-                    <>
-                        <list>
-                            <li>{reminder.periodicity}</li>
-                        </list>
-                    </>
-                )
-            })}
-        </div>
-    )
-}
-
-const MyHistory = (currentUser) => {
-    const [histories, setHistory] = useState(null);
-    const [user, setUser] = useState(currentUser);
-
     useEffect(() => {
-        const fetchData = async () => {
-            const history = await getHistoryFromDB(currentUser)
-            setHistory(history.data.listHistories.items);
-        };
+        syncMessages();
+    }, []);
 
-        if (currentUser) {
-            fetchData();
+    const recommendedAmount = currentUser["custom:weight"] * 0.03
+
+    const createHistoryDb = async (history) => {
+        const options = {
+            query: createHistory,
+            variables: {
+                input: {
+                    amount: history.Field0,
+                    date: new Date().toISOString(),
+                    userID: userFromDb.id,
+                }
+            }
         }
-    }, [user]);
+        await client.graphql(options);
 
+        const updatedHistories = await getHistoryFromDB(currentUser);
+        setHistories(updatedHistories.data.listHistories.items);
+        setConsumedAmount((prevAmount) => prevAmount + parseFloat(history.Field0));
+    }
+
+    const createReminderDb = async (reminder) => {
+        const options = {
+            query: createReminder,
+            variables: {
+                input: {
+                    periodicity: reminder.Field0,
+                    userID: userFromDb.id,
+                }
+            }
+        }
+        await client.graphql(options);
+
+        const updatedReminders = await getRemindersFromDB(currentUser);
+        setReminders(updatedReminders.data.listReminders.items);
+    }
+
+    const calculateConsumedPercentage = () => {
+        // Calculate the percentage based on the user's consumed amount and the recommended amount
+        const percentage = (consumedAmount / recommendedAmount) * 10;
+        return Math.min(100, Math.round(percentage)); // Ensure the result is between 0 and 100
+    };
 
     return (
-        <div>
-            <h4>You've drank water {histories.length} time(s)!</h4>
-            {histories && histories.map((history) => {
-                return (
-                    <>
-                        <list>
-                            <li>{history.date}</li>
-                        </list>
-                    </>
-                )
-            })}
-        </div>
-    )
+        <>
+            <MainPage frame438={<>
+                {user && (<>
+                    <h1>Hello {currentUser?.name?.split(' ')[0]}!</h1>
+                    <h4>Did you know that you should drink {recommendedAmount}L of water per day?</h4>
+                    <h5>You've drank {calculateConsumedPercentage()}% already. How about drinking some water now?</h5>
+                    <NewReminder onSubmit={createReminderDb}/>
+                    <DrinkHistory onSubmit={createHistoryDb}/>
+                    <MyReminders reminders={reminders} setReminders={setReminders}></MyReminders>
+                    <MyHistory histories={histories} setHistories={setHistories}></MyHistory>
+                </>)}
+            </>}/>
+            <button onClick={signOut}>Sign out</button>
+        </>)
 }
 
-export default App
+const MyReminders = ({reminders}) => {
+    return (
+        <div>
+            <h4>Your Reminders</h4>
+            {reminders?.length > 0 ? (
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Total Reminders</TableCell>
+                            <TableCell>Periodicity</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    {reminders.map((reminder, index) => (
+                        <TableRow key={index}>
+                            <TableCell>{index + 1}</TableCell>
+                            <TableCell>{reminder.periodicity}</TableCell>
+                        </TableRow>
+                    ))}
+                </Table>
+            ) : (
+                <p>No reminders set.</p>
+            )}
+        </div>
+    );
+};
+
+
+const MyHistory = ({histories}) => {
+    return (
+        <div>
+            <h4>Your Water Drinking History</h4>
+            {histories?.length > 0 ? (
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Total Times</TableCell>
+                            <TableCell>Details</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    {histories.map((history, index) => (
+                        <TableRow key={history.id}>
+                            <TableCell>{index + 1}</TableCell>
+                            <TableCell>
+                                You've drank {history.amount} at {history.date}
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </Table>
+            ) : (
+                <p>No water drinking history.</p>
+            )}
+        </div>
+    );
+};
+
+export default withInAppMessaging(App)

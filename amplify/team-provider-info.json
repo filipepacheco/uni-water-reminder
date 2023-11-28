@@ -22,7 +22,38 @@
         }
       },
       "auth": {
-        "uniwaterreminder6530b7d1": {}
+        "uniwaterreminder6530b7d1": {},
+        "uniwaterreminder": {
+          "userPoolId": "us-west-2_jxx6uG4WL",
+          "userPoolName": "uni-water-reminder-user-pool",
+          "webClientId": "1pg24lsfdjo66bod2iku7l2a4c",
+          "nativeClientId": "1pg24lsfdjo66bod2iku7l2a4c",
+          "identityPoolId": "us-west-2:43282751-dc7b-41ca-ab5a-5b0385fdac0f",
+          "identityPoolName": "uni-water-reminder-identity-pool",
+          "allowUnauthenticatedIdentities": true,
+          "authRoleArn": "arn:aws:iam::524921764467:role/service-role/cognito-pool",
+          "authRoleName": "cognito-pool",
+          "unauthRoleArn": "arn:aws:iam::524921764467:role/service-role/cognito-pool-guest",
+          "unauthRoleName": "cognito-pool-guest"
+        }
+      },
+      "storage": {
+        "s3uniwaterreminderstorage5e371c1b": {}
+      },
+      "notifications": {
+        "Pinpoint": {
+          "Name": "uniwaterreminder-staging",
+          "Id": "163844ae21cc4ef4b6e840b73ee5980f",
+          "Region": "us-west-2"
+        }
+      },
+      "analytics": {
+        "Pinpoint": {
+          "Name": "uniwaterreminder-staging",
+          "Id": "163844ae21cc4ef4b6e840b73ee5980f",
+          "Region": "us-west-2"
+        },
+        "uniwaterreminder": {}
       }
     }
   }

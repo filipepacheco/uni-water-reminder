@@ -1,0 +1,22 @@
+{
+  "appName": "uniwaterreminder",
+  "roleName": "pinpointLambdaRole1e339129",
+  "cloudformationPolicyName": "cloudformationPolicy1e339129",
+  "cloudWatchPolicyName": "cloudWatchPolicy1e339129",
+  "pinpointPolicyName": "pinpointPolicy1e339129",
+  "authPolicyName": "pinpoint_amplify_1e339129",
+  "unauthPolicyName": "pinpoint_amplify_1e339129",
+  "authRoleName": {
+    "Ref": "AuthRoleName"
+  },
+  "unauthRoleName": {
+    "Ref": "UnauthRoleName"
+  },
+  "authRoleArn": {
+    "Fn::GetAtt": [
+      "AuthRole",
+      "Arn"
+    ]
+  },
+  "pinpointInAppMessagingPolicyName": "pinpointInAppMessagingPolicyName1e339129"
+}

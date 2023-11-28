@@ -15,17 +15,18 @@ import {
   Grid,
   Icon,
   ScrollView,
+  SelectField,
   Text,
   TextField,
   useTheme,
 } from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { generateClient } from "aws-amplify/api";
-import { getUniUser, listHistories, listReminders } from "../graphql/queries";
+import { listHistories, listReminders } from "../graphql/queries";
 import {
+  createUniUser,
   updateHistory,
   updateReminder,
-  updateUniUser,
 } from "../graphql/mutations";
 const client = generateClient();
 function ArrayField({
@@ -183,10 +184,9 @@ function ArrayField({
     </React.Fragment>
   );
 }
-export default function UniUserUpdateForm(props) {
+export default function SignUpForm2(props) {
   const {
-    id: idProp,
-    uniUser: uniUserModelProp,
+    clearOnSuccess = true,
     onSuccess,
     onError,
     onSubmit,
@@ -202,6 +202,8 @@ export default function UniUserUpdateForm(props) {
     Histories: [],
     Reminders: [],
     email: "",
+    gender: "",
+    phone_number: "",
   };
   const [name, setName] = React.useState(initialValues.name);
   const [birthdate, setBirthdate] = React.useState(initialValues.birthdate);
@@ -213,57 +215,27 @@ export default function UniUserUpdateForm(props) {
   const [RemindersLoading, setRemindersLoading] = React.useState(false);
   const [remindersRecords, setRemindersRecords] = React.useState([]);
   const [email, setEmail] = React.useState(initialValues.email);
+  const [gender, setGender] = React.useState(initialValues.gender);
+  const [phone_number, setPhone_number] = React.useState(
+    initialValues.phone_number
+  );
   const autocompleteLength = 10;
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
-    const cleanValues = uniUserRecord
-      ? {
-          ...initialValues,
-          ...uniUserRecord,
-          Histories: linkedHistories,
-          Reminders: linkedReminders,
-        }
-      : initialValues;
-    setName(cleanValues.name);
-    setBirthdate(cleanValues.birthdate);
-    setWeight(cleanValues.weight);
-    setHistories(cleanValues.Histories ?? []);
+    setName(initialValues.name);
+    setBirthdate(initialValues.birthdate);
+    setWeight(initialValues.weight);
+    setHistories(initialValues.Histories);
     setCurrentHistoriesValue(undefined);
     setCurrentHistoriesDisplayValue("");
-    setReminders(cleanValues.Reminders ?? []);
+    setReminders(initialValues.Reminders);
     setCurrentRemindersValue(undefined);
     setCurrentRemindersDisplayValue("");
-    setEmail(cleanValues.email);
+    setEmail(initialValues.email);
+    setGender(initialValues.gender);
+    setPhone_number(initialValues.phone_number);
     setErrors({});
   };
-  const [uniUserRecord, setUniUserRecord] = React.useState(uniUserModelProp);
-  const [linkedHistories, setLinkedHistories] = React.useState([]);
-  const canUnlinkHistories = false;
-  const [linkedReminders, setLinkedReminders] = React.useState([]);
-  const canUnlinkReminders = false;
-  React.useEffect(() => {
-    const queryData = async () => {
-      const record = idProp
-        ? (
-            await client.graphql({
-              query: getUniUser.replaceAll("__typename", ""),
-              variables: { id: idProp },
-            })
-          )?.data?.getUniUser
-        : uniUserModelProp;
-      const linkedHistories = record?.Histories?.items ?? [];
-      setLinkedHistories(linkedHistories);
-      const linkedReminders = record?.Reminders?.items ?? [];
-      setLinkedReminders(linkedReminders);
-      setUniUserRecord(record);
-    };
-    queryData();
-  }, [idProp, uniUserModelProp]);
-  React.useEffect(resetStateValues, [
-    uniUserRecord,
-    linkedHistories,
-    linkedReminders,
-  ]);
   const [currentHistoriesDisplayValue, setCurrentHistoriesDisplayValue] =
     React.useState("");
   const [currentHistoriesValue, setCurrentHistoriesValue] =
@@ -293,12 +265,14 @@ export default function UniUserUpdateForm(props) {
     Reminders: (r) => `${r?.periodicity ? r?.periodicity + " - " : ""}${r?.id}`,
   };
   const validations = {
-    name: [],
-    birthdate: [],
+    name: [{ type: "Required" }],
+    birthdate: [{ type: "Required" }],
     weight: [],
     Histories: [],
     Reminders: [],
-    email: [],
+    email: [{ type: "Required" }, { type: "Email" }],
+    gender: [],
+    phone_number: [{ type: "Phone" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -391,12 +365,14 @@ export default function UniUserUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          name: name ?? null,
-          birthdate: birthdate ?? null,
-          weight: weight ?? null,
-          Histories: Histories ?? null,
-          Reminders: Reminders ?? null,
-          email: email ?? null,
+          name,
+          birthdate,
+          weight,
+          Histories,
+          Reminders,
+          email,
+          gender,
+          phone_number,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -434,125 +410,61 @@ export default function UniUserUpdateForm(props) {
               modelFields[key] = null;
             }
           });
-          const promises = [];
-          const historiesToLink = [];
-          const historiesToUnLink = [];
-          const historiesSet = new Set();
-          const linkedHistoriesSet = new Set();
-          Histories.forEach((r) => historiesSet.add(getIDValue.Histories?.(r)));
-          linkedHistories.forEach((r) =>
-            linkedHistoriesSet.add(getIDValue.Histories?.(r))
-          );
-          linkedHistories.forEach((r) => {
-            if (!historiesSet.has(getIDValue.Histories?.(r))) {
-              historiesToUnLink.push(r);
-            }
-          });
-          Histories.forEach((r) => {
-            if (!linkedHistoriesSet.has(getIDValue.Histories?.(r))) {
-              historiesToLink.push(r);
-            }
-          });
-          historiesToUnLink.forEach((original) => {
-            if (!canUnlinkHistories) {
-              throw Error(
-                `History ${original.id} cannot be unlinked from UniUser because userID is a required field.`
-              );
-            }
-            promises.push(
-              client.graphql({
-                query: updateHistory.replaceAll("__typename", ""),
-                variables: {
-                  input: {
-                    id: original.id,
-                    userID: null,
-                  },
-                },
-              })
-            );
-          });
-          historiesToLink.forEach((original) => {
-            promises.push(
-              client.graphql({
-                query: updateHistory.replaceAll("__typename", ""),
-                variables: {
-                  input: {
-                    id: original.id,
-                    userID: uniUserRecord.id,
-                  },
-                },
-              })
-            );
-          });
-          const remindersToLink = [];
-          const remindersToUnLink = [];
-          const remindersSet = new Set();
-          const linkedRemindersSet = new Set();
-          Reminders.forEach((r) => remindersSet.add(getIDValue.Reminders?.(r)));
-          linkedReminders.forEach((r) =>
-            linkedRemindersSet.add(getIDValue.Reminders?.(r))
-          );
-          linkedReminders.forEach((r) => {
-            if (!remindersSet.has(getIDValue.Reminders?.(r))) {
-              remindersToUnLink.push(r);
-            }
-          });
-          Reminders.forEach((r) => {
-            if (!linkedRemindersSet.has(getIDValue.Reminders?.(r))) {
-              remindersToLink.push(r);
-            }
-          });
-          remindersToUnLink.forEach((original) => {
-            if (!canUnlinkReminders) {
-              throw Error(
-                `Reminder ${original.id} cannot be unlinked from UniUser because userID is a required field.`
-              );
-            }
-            promises.push(
-              client.graphql({
-                query: updateReminder.replaceAll("__typename", ""),
-                variables: {
-                  input: {
-                    id: original.id,
-                    userID: null,
-                  },
-                },
-              })
-            );
-          });
-          remindersToLink.forEach((original) => {
-            promises.push(
-              client.graphql({
-                query: updateReminder.replaceAll("__typename", ""),
-                variables: {
-                  input: {
-                    id: original.id,
-                    userID: uniUserRecord.id,
-                  },
-                },
-              })
-            );
-          });
           const modelFieldsToSave = {
-            name: modelFields.name ?? null,
-            birthdate: modelFields.birthdate ?? null,
-            weight: modelFields.weight ?? null,
-            email: modelFields.email ?? null,
+            name: modelFields.name,
+            birthdate: modelFields.birthdate,
+            weight: modelFields.weight,
+            email: modelFields.email,
           };
-          promises.push(
-            client.graphql({
-              query: updateUniUser.replaceAll("__typename", ""),
+          const uniUser = (
+            await client.graphql({
+              query: createUniUser.replaceAll("__typename", ""),
               variables: {
                 input: {
-                  id: uniUserRecord.id,
                   ...modelFieldsToSave,
                 },
               },
             })
+          )?.data?.createUniUser;
+          const promises = [];
+          promises.push(
+            ...Histories.reduce((promises, original) => {
+              promises.push(
+                client.graphql({
+                  query: updateHistory.replaceAll("__typename", ""),
+                  variables: {
+                    input: {
+                      id: original.id,
+                      userID: uniUser.id,
+                    },
+                  },
+                })
+              );
+              return promises;
+            }, [])
+          );
+          promises.push(
+            ...Reminders.reduce((promises, original) => {
+              promises.push(
+                client.graphql({
+                  query: updateReminder.replaceAll("__typename", ""),
+                  variables: {
+                    input: {
+                      id: original.id,
+                      userID: uniUser.id,
+                    },
+                  },
+                })
+              );
+              return promises;
+            }, [])
           );
           await Promise.all(promises);
           if (onSuccess) {
             onSuccess(modelFields);
+          }
+          if (clearOnSuccess) {
+            resetStateValues();
           }
         } catch (err) {
           if (onError) {
@@ -561,12 +473,12 @@ export default function UniUserUpdateForm(props) {
           }
         }
       }}
-      {...getOverrideProps(overrides, "UniUserUpdateForm")}
+      {...getOverrideProps(overrides, "SignUpForm2")}
       {...rest}
     >
       <TextField
         label="Name"
-        isRequired={false}
+        isRequired={true}
         isReadOnly={false}
         value={name}
         onChange={(e) => {
@@ -579,6 +491,8 @@ export default function UniUserUpdateForm(props) {
               Histories,
               Reminders,
               email,
+              gender,
+              phone_number,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -595,7 +509,7 @@ export default function UniUserUpdateForm(props) {
       ></TextField>
       <TextField
         label="Birthdate"
-        isRequired={false}
+        isRequired={true}
         isReadOnly={false}
         type="date"
         value={birthdate}
@@ -609,6 +523,8 @@ export default function UniUserUpdateForm(props) {
               Histories,
               Reminders,
               email,
+              gender,
+              phone_number,
             };
             const result = onChange(modelFields);
             value = result?.birthdate ?? value;
@@ -642,6 +558,8 @@ export default function UniUserUpdateForm(props) {
               Histories,
               Reminders,
               email,
+              gender,
+              phone_number,
             };
             const result = onChange(modelFields);
             value = result?.weight ?? value;
@@ -667,6 +585,8 @@ export default function UniUserUpdateForm(props) {
               Histories: values,
               Reminders,
               email,
+              gender,
+              phone_number,
             };
             const result = onChange(modelFields);
             values = result?.Histories ?? values;
@@ -750,6 +670,8 @@ export default function UniUserUpdateForm(props) {
               Histories,
               Reminders: values,
               email,
+              gender,
+              phone_number,
             };
             const result = onChange(modelFields);
             values = result?.Reminders ?? values;
@@ -824,7 +746,7 @@ export default function UniUserUpdateForm(props) {
       </ArrayField>
       <TextField
         label="Email"
-        isRequired={false}
+        isRequired={true}
         isReadOnly={false}
         value={email}
         onChange={(e) => {
@@ -837,6 +759,8 @@ export default function UniUserUpdateForm(props) {
               Histories,
               Reminders,
               email: value,
+              gender,
+              phone_number,
             };
             const result = onChange(modelFields);
             value = result?.email ?? value;
@@ -851,19 +775,95 @@ export default function UniUserUpdateForm(props) {
         hasError={errors.email?.hasError}
         {...getOverrideProps(overrides, "email")}
       ></TextField>
+      <SelectField
+        label="Label"
+        placeholder="Rather not say"
+        value={gender}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              birthdate,
+              weight,
+              Histories,
+              Reminders,
+              email,
+              gender: value,
+              phone_number,
+            };
+            const result = onChange(modelFields);
+            value = result?.gender ?? value;
+          }
+          if (errors.gender?.hasError) {
+            runValidationTasks("gender", value);
+          }
+          setGender(value);
+        }}
+        onBlur={() => runValidationTasks("gender", gender)}
+        errorMessage={errors.gender?.errorMessage}
+        hasError={errors.gender?.hasError}
+        {...getOverrideProps(overrides, "gender")}
+      >
+        <option
+          children="Male"
+          value="Male"
+          {...getOverrideProps(overrides, "genderoption0")}
+        ></option>
+        <option
+          children="Female"
+          value="Female"
+          {...getOverrideProps(overrides, "genderoption1")}
+        ></option>
+        <option
+          children="Other"
+          value="Other"
+          {...getOverrideProps(overrides, "genderoption2")}
+        ></option>
+      </SelectField>
+      <TextField
+        label="Label"
+        isRequired={false}
+        type="tel"
+        value={phone_number}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              birthdate,
+              weight,
+              Histories,
+              Reminders,
+              email,
+              gender,
+              phone_number: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.phone_number ?? value;
+          }
+          if (errors.phone_number?.hasError) {
+            runValidationTasks("phone_number", value);
+          }
+          setPhone_number(value);
+        }}
+        onBlur={() => runValidationTasks("phone_number", phone_number)}
+        errorMessage={errors.phone_number?.errorMessage}
+        hasError={errors.phone_number?.hasError}
+        {...getOverrideProps(overrides, "phone_number")}
+      ></TextField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}
       >
         <Button
-          children="Reset"
+          children="Clear"
           type="reset"
           onClick={(event) => {
             event.preventDefault();
             resetStateValues();
           }}
-          isDisabled={!(idProp || uniUserModelProp)}
-          {...getOverrideProps(overrides, "ResetButton")}
+          {...getOverrideProps(overrides, "ClearButton")}
         ></Button>
         <Flex
           gap="15px"
@@ -873,10 +873,7 @@ export default function UniUserUpdateForm(props) {
             children="Submit"
             type="submit"
             variation="primary"
-            isDisabled={
-              !(idProp || uniUserModelProp) ||
-              Object.values(errors).some((e) => e?.hasError)
-            }
+            isDisabled={Object.values(errors).some((e) => e?.hasError)}
             {...getOverrideProps(overrides, "SubmitButton")}
           ></Button>
         </Flex>
